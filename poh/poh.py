@@ -23,6 +23,8 @@ import textwrap
 import time
 import re
 
+import poh
+
 import termios
 
 _CMD_EPILOG = """\
@@ -328,7 +330,8 @@ def _create_argparser():
         description=__doc__, epilog=_CMD_EPILOG
     )
     add_arg = parser.add_argument
-    add_arg('-V', '--version', action='store_true',
+    add_arg('-V', '--version', action='version',
+            version='{} v{}'.format(__MODULENAME, poh.__versionstr__),
             help="Show version string and exit")
     add_arg('-x', '--debug', action='store_true',
             help="Include debugging information. (implies maximum verbosity)")
