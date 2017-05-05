@@ -14,6 +14,7 @@ import itertools
 import logging
 import operator
 import os
+import shlex
 import shutil
 import struct
 import subprocess
@@ -391,9 +392,12 @@ def _read_commands_files(commands_files):
     for commands_file in commands_files:
         file_name = commands_file.name
         LOG.debug('Processing command file at %s', file_name)
-        lines_in_file = commands_file.readlines()
+        whole_file = commands_file.read()
+        whole_file = whole_file.replace('\\\n', ' ')
+        lines_in_file = whole_file.splitlines()
 
-        commands_in_file = [line.rstrip('\n') for line in lines_in_file
+        commands_in_file = [' '.join(shlex.split(line))+'\n'
+                            for line in lines_in_file
                             if not line.startswith('#') and line != '']
 
         num_of_commands = len(commands_in_file)
