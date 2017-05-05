@@ -885,6 +885,8 @@ def run_poh(servers, commands, ssh_config=None, output_dir=None,
         LOG.debug("Created temporary directory at %r.", output_dir)
 
     start_time = time.time()
+    if ssh_config is None and 'SSH_CONFIG' in os.environ:
+        ssh_config = os.environ['SSH_CONFIG']
     remote_execute(servers, commands, output_dir, ssh_config)
     end_time = time.time()
     if raw_output or quiet_output:
