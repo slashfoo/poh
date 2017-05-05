@@ -14,7 +14,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='poh',
-    version='0.1.1',
+    version='0.1.2',
     description='ssh commands runner',
     long_description=long_description,
     url='https://github.com/slashfoo/poh',
