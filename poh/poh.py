@@ -283,6 +283,8 @@ def _printable_string(original_string):
     escaped_string = escaped_repr[escaped_repr.index("'")+1:-1]
     escaped_string = escaped_string.replace("\\\\", "\\")
     escaped_string = escaped_string.replace("\\'", "'")
+    if escaped_string.endswith(r'\n'):
+        escaped_string = escaped_string[:-2]
     return escaped_string
 
 def _prettified_args(args_dict):
