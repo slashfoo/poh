@@ -506,7 +506,21 @@ def read_result_files(output_dir, one_line=False):
             })
 
             lines_in_file = _count_lines(resultfile)
-            cmd_results[filetype] = (reader_func(resultfile), lines_in_file,)
+            LOG.debug("%r: %r", filetype, resultfile)
+            if filetype == 'stderr':
+                contents_string = reader_func(resultfile)
+                contents_string = re.sub(
+                    r'^ControlSocket .*?\n?$', '', contents_string
+                )
+                cmd_results[filetype] = (
+                    contents_string,
+                    lines_in_file,
+                )
+            else:
+                cmd_results[filetype] = (
+                    reader_func(resultfile),
+                    lines_in_file,
+                )
 
             total_lines += lines_in_file
 
@@ -835,11 +849,17 @@ def redirect_streams(output_dir, quiet, transpose_output=False,
                 dest_stream.write('\n')
             continue
         elif dest_stream is sys.stderr:
-            writefunc = lambda line: dest_stream.write(
-                line_format.format(srv, _escaped_with(
-                    line, ['fg_red']
-                ) if color else line)
-            )
+            def writefunc(line):
+                out_line = line
+                if line.startswith('ControlSocket ') and \
+                   'already exists, disabling multiplexing' in line:
+                    LOG.debug("Got ControlSocket message from ssh,"
+                              " removing from stderr. Line: %r", line)
+                    return
+                if color:
+                    out_line = _escaped_with(out_line, ['fg_red'])
+                out_line = line_format.format(srv, out_line)
+                dest_stream.write(out_line)
         else:
             writefunc = lambda line: dest_stream.write(
                 line_format.format(srv, line)
